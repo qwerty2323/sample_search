@@ -1,16 +1,10 @@
 class SimpleIndex
   attr_reader :index
 
-  def initialize(persons)
-    @index = {} and FIELDS.keys.each{|n| @index[n]={}}
-    persons.each_pair do |id, person|
-      person = Marshal.load person
-      person.each_with_index do |v, k|
-        @index[FIELDS.invert[k]][v] ||= []
-        @index[FIELDS.invert[k]][v] << id.to_i
-      end
-    end
-    @index.keys.each {|field| @index[field] = Hash[@index[field].sort_by{|k, v| k}]}
+  def initialize(points)
+    @index = [{}, {}, {}]
+    points.each{|id, point| point.each_with_index{|v, i| @index[i][v] ? @index[i][v]<<id.to_i : @index[i][v]=[]}}
+    @index.map{|field| field = Hash[field.sort_by{|k, v| k}]}
   end
 
   def select_from(field, range=nil)

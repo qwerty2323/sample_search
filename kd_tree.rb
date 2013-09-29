@@ -2,8 +2,8 @@ class KDTree
   attr_reader :root
   attr_reader :points
 
-  def initialize(points)
-    @dim = 3
+  def initialize(points, dim=3)
+    @dim = dim
     @root = KDNode.new(@dim).parse(points)
   end
 
@@ -18,12 +18,16 @@ class KDTree
     @points
   end
 
-  def query(range, node, l=1)
+  def query(range, node)
     a = node.axis
     median = node.location[a]
-    self.query(range, node.left, l+1) if node.left && (range[a].nil? || range[a].begin<=median)
-    self.query(range, node.right, l+1) if node.right && (range[a].nil? || median<=range[a].end)
-    @points << node.location.last if (0..@dim-1).all?{|d| range[d] ? range[d].include?(node.location[d]) : true}
+    self.query(range, node.left) if node.left && (range[a].nil? || range[a].begin<=median)
+    self.query(range, node.right) if node.right && (range[a].nil? || median<=range[a].end)
+    @points << node.location.last if (0..@dim-1).all?{|d| range[d].nil? ? true : range[d].include?(node.location[d])}
+  end
+
+  def print
+    @root.print
   end
 end
 
