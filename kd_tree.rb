@@ -1,6 +1,6 @@
 class KDTree
-  attr_reader :root
-  attr_reader :points
+  attr_reader :root,
+              :points
 
   def initialize(points, dim=3)
     @dim = dim
@@ -14,16 +14,17 @@ class KDTree
   def find(*range)
     @points = []
     # @root.print
-    self.query(range, @root)
+    self.query(range, @root){|p| @points<<p}
     @points
   end
 
   def query(range, node)
+    return unless node
     a = node.axis
     median = node.location[a]
-    self.query(range, node.left) if node.left && (range[a].nil? || range[a].begin<=median)
-    self.query(range, node.right) if node.right && (range[a].nil? || median<=range[a].end)
-    @points << node.location.last if (0..@dim-1).all?{|d| range[d].nil? ? true : range[d].include?(node.location[d])}
+    self.query(range, node.left){|p| yield p} if range[a].nil? || range[a].begin<=median
+    self.query(range, node.right){|p| yield p} if range[a].nil? || median<=range[a].end
+    yield node.location.last if node.match? range
   end
 
   def print
@@ -32,9 +33,10 @@ class KDTree
 end
 
 class KDNode
-  attr_reader :left, :right
-  attr_reader :location
-  attr_reader :axis
+  attr_reader :left,
+              :right,
+              :location,
+              :axis
 
   def initialize(dim, location=nil, left=nil, right=nil)
     @dim = dim
@@ -59,6 +61,10 @@ class KDNode
     else
       @right ? @right.add(point) : @right = KDNode.new(point)
     end
+  end
+
+  def match?(range)
+    (0..@dim-1).all?{|d| range[d].nil? or range[d].cover?(self.location[d])}
   end
 
   def print(l=0)

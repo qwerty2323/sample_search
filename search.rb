@@ -8,10 +8,10 @@ FIELDS = {age:0, height:1, weight:2, salary:3}
 BOUNDS = {age:0..100, height:0..200, weight:0..200, salary:0..10000000.0}
 
 class SampleSearch
-  attr_reader :filenames
-  attr_reader :persons
-  attr_reader :index
-  attr_reader :tree
+  attr_reader :filenames,
+              :persons,
+              :index,
+              :tree
 
   def initialize(size=1000)
     puts 'Init...'
