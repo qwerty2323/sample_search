@@ -3,7 +3,7 @@ class SimpleIndex
 
   def initialize(points)
     @index = [{}, {}, {}]
-    points.each{|id, point| point.each_with_index{|v, i| @index[i][v] ? @index[i][v]<<id.to_i : @index[i][v]=[]}}
+    points.each{|id, point| point.each_with_index{|v, i| (@index[i][v] ||= []) << id.to_i}}
     @index.map{|field| field = Hash[field.sort_by{|k, v| k}]}
   end
 
